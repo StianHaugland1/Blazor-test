@@ -1,17 +1,21 @@
-﻿
+﻿@inject NavigationManager Navigation
 
+@{
+    var currentPage = Navigation.Uri;
+    var isCounterPage = currentPage.Contains("/counter");
+    var isLeaderboardPage = currentPage.Contains("/leaderboard");
+    var activeClassName = "bg-primary-100";
+}
 
 <nav class="absolute bottom-4 left-0 right-0 px-4">
     <div class="mx-auto flex max-w-fit flex-row justify-center gap-2 rounded-lg bg-white p-1">
-
-        <div class="bg-f rounded-lg p-2">
+        <a class="bg-f rounded-lg p-2 @(isCounterPage ? activeClassName : null)" href="/counter">
             <FotballIcon />
-        </div>
+        </a>
 
-        <div class="rounded-lg bg-primary-100 p-2">
+        <a class="rounded-lg p-2 @(isLeaderboardPage ? activeClassName : null)" href="/leaderboard">
             <FotballIcon />
-        </div>
+        </a>
     </div>
-
 </nav>
 
