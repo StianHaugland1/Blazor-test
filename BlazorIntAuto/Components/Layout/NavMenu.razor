@@ -2,14 +2,14 @@
 
 @{
     var currentPage = Navigation.Uri;
-    var isCounterPage = currentPage.Contains("/counter");
+    var isQrScannerPage = currentPage.Contains("/counter");
     var isLeaderboardPage = currentPage.Contains("/leaderboard");
     var activeClassName = "bg-primary-100";
 }
 
 <nav class="absolute bottom-4 left-0 right-0 px-4">
     <div class="mx-auto flex max-w-fit flex-row justify-center gap-2 rounded-lg bg-white p-1">
-        <a class="bg-f rounded-lg p-2 @(isCounterPage ? activeClassName : null)" href="/counter">
+        <a class="bg-f rounded-lg p-2 @(isQrScannerPage ? activeClassName : null)" href="/qr-scanner">
             <QrScannerIcon />
         </a>
 
