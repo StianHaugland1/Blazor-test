@@ -1,19 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-<main class="relative h-screen bg-primaryBg p-4">
-    @* <AuthorizeView> *@
-    @*     <Authorized> *@
-    @*         <a href="Account/Logout">Log out</a> *@
-    @*     </Authorized> *@
-    @*     <NotAuthorized> *@
-    @*         <RedirectHelper ToPath="/login"/> *@
-    @*         $1$ <a href="Account/Login?redirectUri=/">Log in</a> #1# *@
-    @*     </NotAuthorized> *@
-    @* </AuthorizeView> *@
-    
-    <article class="">
-        @Body
-    </article>
-    <NavMenu/>
+<main class="relative h-screen bg-primaryBg p-4 flex-col">
+    <AuthorizeView>
+        <Authorized>
+            <article class="flex-grow">
+                @Body
+            </article>
+            <NavMenu/>
+        </Authorized>
+        <NotAuthorized>
+            <RedirectHelper ToPath="/login"/>
+        </NotAuthorized>
+    </AuthorizeView>
 </main>
 

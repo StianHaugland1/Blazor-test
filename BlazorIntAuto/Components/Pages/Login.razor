@@ -1,5 +1,21 @@
 ﻿@page "/login"
 @layout LoginLayout
 
-<h3>Login</h3>
+<div class="flex flex-col justify-center items-center flex-1 text-white gap-8">
 
+    <h1 class="text-3xl">Welcome to Gamify! 😎</h1>
+    <div class="min-w-32 h-32 relative">
+        <div class="p-1 rounded-full absolute w-4/6 right-1 top-1 bg-white">
+            <div class="bg-orange-300 rounded-full p-2">
+                <GameControllerIcon/>
+            </div>
+        </div>
+        <div class="rounded-full p-1 absolute w-4/6 bottom-1 left-1 bg-white">
+            <div class="bg-emerald-300 rounded-full p-2">
+                <GameControllerIcon/>
+            </div>
+        </div>
+    </div>
+    <a href="/account/login" class="bg-white text-primary-200 font-bold px-8 py-3 rounded-lg">Sign in with Auth0</a>
+
+</div>
