@@ -1,5 +1,6 @@
 ﻿@page "/leaderboard"
 @rendermode InteractiveAuto
+@attribute [Authorize]
 
 <h3>Leaderboard</h3>
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
