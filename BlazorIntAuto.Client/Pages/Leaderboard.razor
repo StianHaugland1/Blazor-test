@@ -1,16 +1,46 @@
 ﻿@page "/leaderboard"
-@rendermode InteractiveAuto
-@attribute [Authorize]
+@using System.Security.Claims
+@rendermode InteractiveWebAssembly
+@* @attribute [Authorize] *@
 
-<h3>Leaderboard</h3>
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Leaderboard</h3>
+        <button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <!-- Weather goes here -->
+    </Authorized>
+    <NotAuthorized>
+        <button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <!-- Weather goes here -->
+        You are not authorised!
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-      private int _currentCount = 0;
-          private void IncrementCount()
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private int _currentCount = 0;
+    private async void IncrementCount()
     {
         _currentCount++;
         Console.WriteLine("Incremented count");
+        if(authenticationState is not null){
+            var state = await authenticationState;
+            var l = state.User.Claims.ToList();
+
+            @* Console.WriteLine(l[1]);
+            Console.WriteLine(l[0]);
+            Console.WriteLine(l[3]); *@
+            Console.WriteLine(l[2]);
+            Console.WriteLine("hi");
+            var k = state.User.FindFirst("SomeThing");
+            Console.WriteLine(k?.Value);
+        }
+
+        
+        
     }
 
 }
+    @* using System.Security.Claims; *@

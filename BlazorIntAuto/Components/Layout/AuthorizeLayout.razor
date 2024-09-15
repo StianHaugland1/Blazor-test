@@ -1,0 +1,16 @@
+@inherits LayoutComponentBase
+
+@* <main class="relative h-screen bg-primaryBg p-4 flex-col"> *@
+    <AuthorizeView>
+        <Authorized>
+            @* <article class="flex-grow"> *@
+                @Body
+            @* </article> *@
+            @* <NavMenu/> *@
+        </Authorized>
+        <NotAuthorized>
+            <RedirectHelper ToPath="/login"/>
+        </NotAuthorized>
+    </AuthorizeView>
+@* </main> *@
+

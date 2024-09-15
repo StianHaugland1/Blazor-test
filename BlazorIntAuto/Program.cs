@@ -3,6 +3,7 @@ using BlazorIntAuto.Components;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
@@ -63,7 +64,7 @@ builder.Services
             }
         };
     });
-
+builder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
