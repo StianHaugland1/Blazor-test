@@ -1,0 +1,10 @@
+@inherits LayoutComponentBase
+
+<AuthorizeView>
+  <Authorized>
+    @Body
+  </Authorized>
+  <NotAuthorized>
+    <RedirectHelper ToPath="/login" />
+  </NotAuthorized>
+</AuthorizeView>
