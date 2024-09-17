@@ -4,6 +4,7 @@
     var currentPage = Navigation.Uri;
     var isQrScannerPage = currentPage.Contains("/qr-scanner");
     var isLeaderboardPage = currentPage.Contains("/leaderboard");
+    var isProfilePage = currentPage.Contains("/profile");
     var activeClassName = "bg-primary-100";
 }
 
@@ -15,6 +16,9 @@
 
         <a class="rounded-lg p-2 @(isLeaderboardPage ? activeClassName : null)" href="/leaderboard">
             <LeaderboardIcon />
+        </a>
+        <a class="rounded-lg p-2 @(isProfilePage ? activeClassName : null)" href="/profile">
+            <ProfileIcon />
         </a>
     </div>
 </nav>

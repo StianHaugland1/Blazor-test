@@ -1,0 +1,56 @@
+@page "/profile"
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+@inject IHttpClientFactory HttpClientFactory
+@inject HttpClient httpClient
+
+
+<div>Hello world</div>
+@if (player == null)
+{
+    <p><em>Loading...</em></p>
+}
+
+@if (player != null)
+{
+<div class="flex flex-col items-center justify-center gap-4">
+    <EditForm class="flex flex-col items-center justify-center gap-4" Model=@Person OnSubmit=@FormSubmitted>
+      <InputText class="bg-green-500 w-[200px]" @bind-Value="Person.Name" />
+      <InputNumber class="bg-green-500 w-[200px]" @bind-Value="Person.Age" />
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+    </EditForm>
+
+  <a class="bg-red-500 px-8 py-4 text-white" href="Account/Logout">Log out</a>
+</div>
+}
+
+<button @onclick="onclick">click me</button>
+
+
+@code
+{
+
+  public async Task onclick()
+  {
+    Console.WriteLine("clicked");
+    player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current");
+  }
+	string Status = "Not submitted";
+	Person Person = new Person();
+
+  private PlayerDto player;
+
+    @* protected override async Task OnInitializedAsync()
+    {
+        await http?.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current");
+    } *@
+    protected override async Task OnInitializedAsync()
+    {
+        player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current");
+    }
+
+	void FormSubmitted()
+	{
+		Status = "Form submitted";
+		// Post data to the server, etc
+	}
+}

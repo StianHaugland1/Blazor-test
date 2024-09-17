@@ -1,8 +1,10 @@
+using System.Security.Claims;
 using Auth0.AspNetCore.Authentication;
 using BlazorIntAuto.Components;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
@@ -46,7 +48,7 @@ builder.Services
                 var dbContext = context.HttpContext.RequestServices.GetRequiredService<MongoDbContext>();
 
                 var player = dbContext.Players.FirstOrDefault(x => x.AuthId == authId);
-                if (player == null) 
+                if (player == null)
                 {
                     player = new Player
                     {
@@ -65,6 +67,13 @@ builder.Services
         };
     });
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
+// builder.Services.AddHttpClient();
+
+            // builder.Services.AddHttpClient("ServerAPI", client => 
+            // {
+            //     client.BaseAddress = new Uri("https://localhost:7275");
+            // });
+            // builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("ServerAPI"));
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
@@ -112,6 +121,63 @@ app.MapGet("/test", async (MongoDbContext mongoDbContext) =>
     // var user = await mongoDbContext.Users.FirstOrDefaultAsync();
     // return Results.Ok(user);
     return Results.Ok();
+});
+
+app.MapGet("/api/players", async (MongoDbContext mongoDbContext) =>
+{
+    var players = await mongoDbContext.Players.ToListAsync();
+    return Results.Ok(players);
+});
+
+// current player
+app.MapGet("/api/players/current", async (HttpContext httpContext, MongoDbContext mongoDbContext) =>
+{
+    var user = httpContext.User;
+    var authId = httpContext.User.Claims.SingleOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+
+    Console.WriteLine(authId);
+    Console.WriteLine("hello");
+    Console.WriteLine(httpContext.User.Identity?.Name);
+    var player = await mongoDbContext.Players.FirstOrDefaultAsync(x => x.AuthId == authId);
+    if (player == null)
+    {
+        // return Results.NotFound();
+        return Results.Ok();
+    }
+    var playerDto = new PlayerDto
+    {
+        Name = player.Name,
+        Nickname = player.Nickname,
+        Emoji = player.Emoji,
+        AuthId = player.AuthId,
+        Wins = player.Wins,
+        Losses = player.Losses,
+        TotalMatches = player.TotalMatches,
+        Rating = player.Rating
+    };
+    return Results.Ok(player);
+});
+
+app.MapGet("/api/players/{id}", async (MongoDbContext mongoDbContext, string id) =>
+{
+    var player = await mongoDbContext.Players.FirstOrDefaultAsync(x => x.AuthId == id);
+    if (player == null)
+    {
+        // return Results.NotFound();
+        return Results.Ok();
+    }
+    var playerDto = new PlayerDto
+    {
+        Name = player.Name,
+        Nickname = player.Nickname,
+        Emoji = player.Emoji,
+        AuthId = player.AuthId,
+        Wins = player.Wins,
+        Losses = player.Losses,
+        TotalMatches = player.TotalMatches,
+        Rating = player.Rating
+    };
+    return Results.Ok(player);
 });
 
 
