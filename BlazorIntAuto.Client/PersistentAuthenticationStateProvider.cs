@@ -22,6 +22,7 @@ public class PersistentAuthenticationStateProvider : AuthenticationStateProvider
             new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
             new Claim(ClaimTypes.Name, userInfo.Name),
             new Claim("SomeThing", userInfo.SomeThing),
+            new Claim("db_id", userInfo.DbId),
             ];
 
         _authenticationStateTask = Task.FromResult(
@@ -37,4 +38,5 @@ public class UserInfo
     public required string UserId { get; set; }
     public required string Name { get; set; }
     public required string SomeThing { get; set; }
+    public required string DbId { get; set; }
 }

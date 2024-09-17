@@ -1,8 +1,8 @@
 @page "/profile"
 @using System.Security.Claims
-@rendermode @(new InteractiveAutoRenderMode(prerender: false))
+@* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
 @* @rendermode @(new InteractiveServerRenderMode(prerender: false)) *@
-@* @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false)) *@
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 @* @rendermode InteractiveAuto *@
 @inject PersistentComponentState ApplicationState
 @inject IPlayerAppService PlayerService
@@ -149,8 +149,11 @@
     if (authenticationState is not null)
     {
       var state = await authenticationState;
+
       Console.WriteLine(state.User.Identity.Name);
       var id = state.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+      var test = state.User.FindFirst(x => x.Type == "db_id")?.Value;
+      Console.WriteLine(test);
       Console.WriteLine(id);
       if (id is not null)
       {

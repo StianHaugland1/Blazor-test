@@ -65,6 +65,12 @@ builder.Services
                     dbContext.Players.Add(player);
                     await dbContext.SaveChangesAsync();
                 }
+                if(context?.Principal?.Identity is not null)
+                {
+                    var claimsIdentity = (ClaimsIdentity)context.Principal.Identity;
+                    claimsIdentity.AddClaim(new Claim("db_id", player.Id.ToString()));
+                    context.Principal = new ClaimsPrincipal(claimsIdentity);
+                }
             }
         };
     });

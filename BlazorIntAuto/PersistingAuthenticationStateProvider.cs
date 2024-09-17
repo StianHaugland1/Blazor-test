@@ -44,15 +44,16 @@ public class PersistingAuthenticationStateProvider : ServerAuthenticationStatePr
         if (principal.Identity?.IsAuthenticated == true)
         {
             var userId = principal.FindFirst(_options.ClaimsIdentity.UserIdClaimType)?.Value;
+            var dbId = principal.FindFirst("db_id")?.Value;
             var name = principal.FindFirst("name")?.Value;
-            var p = await _playerService.GetPlayerById(userId);
-            if (userId != null && name != null)
+            if (userId != null && name != null && dbId != null)
             {
                 _state.PersistAsJson(nameof(UserInfo), new UserInfo
                 {
                     UserId = userId,
-                    Name = p.Id.ToString(),
-                    SomeThing = "WHAAATEVER"
+                    Name = name,
+                    SomeThing = "WHAAATEVER",
+                    DbId = dbId
                 });
             }
         }
@@ -78,4 +79,5 @@ public class UserInfo
     public required string UserId { get; set; }
     public required string Name { get; set; }
     public required string SomeThing { get; set; }
+    public required string DbId { get; set; }
 }
