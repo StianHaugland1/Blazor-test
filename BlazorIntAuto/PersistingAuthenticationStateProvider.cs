@@ -15,43 +15,48 @@ public class PersistingAuthenticationStateProvider : ServerAuthenticationStatePr
     private readonly PersistentComponentState _state;
     private readonly PersistingComponentStateSubscription _subscription;
     private readonly IdentityOptions _options;
+    private readonly IPlayerService _playerService;
 
     public PersistingAuthenticationStateProvider(
         PersistentComponentState persistentComponentState,
-        IOptions<IdentityOptions> optionsAccessor)
+        IOptions<IdentityOptions> optionsAccessor,
+        IPlayerService playerService
+        )
     {
         _options = optionsAccessor.Value;
         _state = persistentComponentState;
         AuthenticationStateChanged += OnAuthenticationStateChanged;
         _subscription = _state.RegisterOnPersisting(OnPersistingAsync, RenderMode.InteractiveWebAssembly);
+        _playerService = playerService;
+
     }
 
     private async Task OnPersistingAsync()
-{
-    if (_authenticationStateTask is null)
     {
-        throw new UnreachableException($"Authentication state not set in {nameof(OnPersistingAsync)}().");
-    }
-
-    var authenticationState = await _authenticationStateTask;
-    var principal = authenticationState.User;
-
-    if (principal.Identity?.IsAuthenticated == true)
-    {
-        var userId = principal.FindFirst(_options.ClaimsIdentity.UserIdClaimType)?.Value;
-        var name = principal.FindFirst("name")?.Value;
-
-        if (userId != null && name != null)
+        if (_authenticationStateTask is null)
         {
-            _state.PersistAsJson(nameof(UserInfo), new UserInfo
+            throw new UnreachableException($"Authentication state not set in {nameof(OnPersistingAsync)}().");
+        }
+
+        var authenticationState = await _authenticationStateTask;
+        var principal = authenticationState.User;
+
+        if (principal.Identity?.IsAuthenticated == true)
+        {
+            var userId = principal.FindFirst(_options.ClaimsIdentity.UserIdClaimType)?.Value;
+            var name = principal.FindFirst("name")?.Value;
+            var p = await _playerService.GetPlayerById(userId);
+            if (userId != null && name != null)
             {
-                UserId = userId,
-                Name = name,
-                SomeThing = "WHAAATEVER"
-            });
+                _state.PersistAsJson(nameof(UserInfo), new UserInfo
+                {
+                    UserId = userId,
+                    Name = p.Id.ToString(),
+                    SomeThing = "WHAAATEVER"
+                });
+            }
         }
     }
-}
 
 
 

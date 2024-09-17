@@ -1,12 +1,13 @@
 using System.Security.Claims;
 using Auth0.AspNetCore.Authentication;
+using BlazorIntAuto.Common.Interfaces;
 using BlazorIntAuto.Components;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,7 @@ builder.Services
                 {
                     player = new Player
                     {
+                        Id = ObjectId.GenerateNewId(),
                         AuthId = authId!,
                         Nickname = nickname ?? "Player",
                         Name = name ?? "Name not found",
@@ -67,17 +69,13 @@ builder.Services
         };
     });
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
-// builder.Services.AddHttpClient();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IPlayerAppService, PlayerAppService>();
 
-            // builder.Services.AddHttpClient("ServerAPI", client => 
-            // {
-            //     client.BaseAddress = new Uri("https://localhost:7275");
-            // });
-            // builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("ServerAPI"));
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
 
 
 var app = builder.Build();

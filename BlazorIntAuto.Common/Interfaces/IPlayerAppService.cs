@@ -1,5 +1,5 @@
 namespace BlazorIntAuto.Common.Interfaces;
-public interface IPlayerService
+public interface IPlayerAppService
 {
     Task<PlayerDto> GetPlayerById(string id);
     // Task<Player[]> GetPlayers();

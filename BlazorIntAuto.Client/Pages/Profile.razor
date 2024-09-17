@@ -1,56 +1,178 @@
 @page "/profile"
-@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
-@inject IHttpClientFactory HttpClientFactory
-@inject HttpClient httpClient
+@using System.Security.Claims
+@rendermode @(new InteractiveAutoRenderMode(prerender: false))
+@* @rendermode @(new InteractiveServerRenderMode(prerender: false)) *@
+@* @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false)) *@
+@* @rendermode InteractiveAuto *@
+@inject PersistentComponentState ApplicationState
+@inject IPlayerAppService PlayerService
+@attribute [Authorize]
+@implements IDisposable
 
 
 <div>Hello world</div>
-@if (player == null)
+@if (_player == null)
 {
-    <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
 }
 
-@if (player != null)
+@if (_player != null)
 {
-<div class="flex flex-col items-center justify-center gap-4">
+  <div class="flex flex-col items-center justify-center gap-4">
     <EditForm class="flex flex-col items-center justify-center gap-4" Model=@Person OnSubmit=@FormSubmitted>
       <InputText class="bg-green-500 w-[200px]" @bind-Value="Person.Name" />
       <InputNumber class="bg-green-500 w-[200px]" @bind-Value="Person.Age" />
-      <input type="submit" value="Submit" class="btn btn-primary"/>
+      <input type="submit" value="Submit" class="btn btn-primary" />
     </EditForm>
 
-  <a class="bg-red-500 px-8 py-4 text-white" href="Account/Logout">Log out</a>
-</div>
+    <a class="bg-red-500 px-8 py-4 text-white" href="Account/Logout">Log out</a>
+  </div>
+  <div>@_player.Emoji</div>
 }
 
 <button @onclick="onclick">click me</button>
 
 
+
 @code
 {
+  [CascadingParameter]
+  private Task<AuthenticationState>? authenticationState { get; set; }
 
   public async Task onclick()
   {
     Console.WriteLine("clicked");
-    player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current");
-  }
-	string Status = "Not submitted";
-	Person Person = new Person();
-
-  private PlayerDto player;
-
-    @* protected override async Task OnInitializedAsync()
+    var foundInState = ApplicationState
+    .TryTakeFromJson<PlayerDto>("player", out var player);
+    if (foundInState)
     {
-        await http?.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current");
-    } *@
-    protected override async Task OnInitializedAsync()
-    {
-        player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current");
+      Console.WriteLine("FOUND PLAYERT");
+      @* _player = player; *@
+      return;
     }
+    Console.WriteLine("NotFOUND");
+    @* player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current"); *@
+  }
+  string Status = "Not submitted";
+  Person Person = new Person();
 
-	void FormSubmitted()
-	{
-		Status = "Form submitted";
-		// Post data to the server, etc
-	}
+  private PlayerDto? _player;
+
+  private PersistingComponentStateSubscription _subscription;
+
+
+  protected override async Task OnInitializedAsync()
+  {
+    if(authenticationState is null)
+    {
+      Console.WriteLine("WOPWO");
+    }
+    _subscription = ApplicationState.RegisterOnPersisting(Persist);
+    var foundInState = ApplicationState
+    .TryTakeFromJson<PlayerDto>("player", out var player);
+    if (foundInState)
+    {
+      Console.WriteLine("FOUND PLAYERT");
+      _player = player;
+      return;
+    }
+      Console.WriteLine("Player not found");
+
+    if (authenticationState is not null)
+    {
+      var state = await authenticationState;
+      Console.WriteLine(state.User.Identity.Name);
+      var id = state.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+      Console.WriteLine(id);
+      if (id is not null)
+      {
+        _player = await PlayerService.GetPlayerById(id);
+      }
+    }
+    @* player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current"); *@
+  }
+  private Task Persist()
+  {
+    ApplicationState.PersistAsJson("player", _player);
+    return Task.CompletedTask;
+  }
+
+  public void Dispose()
+  {
+    _subscription.Dispose();
+  }
+
+  void FormSubmitted()
+  {
+    Status = "Form submitted";
+    // Post data to the server, etc
+  }
 }
