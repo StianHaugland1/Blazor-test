@@ -7,10 +7,10 @@ public class PlayerAppService(IPlayerService playerService) : IPlayerAppService
         var player = await playerService.GetPlayerById(id);
         var playerDto = new PlayerDto
         {
+            Id = player.Id.ToString(),
             Name = player.Name,
             Nickname = player.Nickname,
             Emoji = player.Emoji,
-            AuthId = player.AuthId,
             Wins = player.Wins,
             Losses = player.Losses,
             TotalMatches = player.TotalMatches,

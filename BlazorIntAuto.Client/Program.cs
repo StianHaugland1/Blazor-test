@@ -8,7 +8,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 // builder.Services.AddScoped<CookieHandler>();    
-builder.Services.AddScoped<IPlayerAppService, PlayerAppService>();
+builder.Services.AddScoped<IPlayerAppService, PlayerClientService>();
 // builder.Services.AddHttpClient("base").AddHttpMessageHandler<CookieHandler>();
 // builder.Services.AddScoped<IHttpClientFactory>();
 // builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("base"));

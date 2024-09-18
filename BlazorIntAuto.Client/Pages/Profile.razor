@@ -1,88 +1,11 @@
 @page "/profile"
 @using System.Security.Claims
-@* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
-@* @rendermode @(new InteractiveServerRenderMode(prerender: false)) *@
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
-@* @rendermode InteractiveAuto *@
 @inject PersistentComponentState ApplicationState
 @inject IPlayerAppService PlayerService
 @attribute [Authorize]
 @implements IDisposable
 
-
-<div>Hello world</div>
-@if (_player == null)
-{
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-  <p><em>Loading...</em></p>
-}
 
 @if (_player != null)
 {
@@ -96,31 +19,20 @@
     <a class="bg-red-500 px-8 py-4 text-white" href="Account/Logout">Log out</a>
   </div>
   <div>@_player.Emoji</div>
+  <button @onclick="onclick">click me</button>
 }
-
-<button @onclick="onclick">click me</button>
-
-
 
 @code
 {
   [CascadingParameter]
   private Task<AuthenticationState>? authenticationState { get; set; }
 
-  public async Task onclick()
+  public void onclick()
   {
     Console.WriteLine("clicked");
-    var foundInState = ApplicationState
-    .TryTakeFromJson<PlayerDto>("player", out var player);
-    if (foundInState)
-    {
-      Console.WriteLine("FOUND PLAYERT");
-      @* _player = player; *@
-      return;
-    }
-    Console.WriteLine("NotFOUND");
-    @* player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current"); *@
+
   }
+
   string Status = "Not submitted";
   Person Person = new Person();
 
@@ -131,36 +43,29 @@
 
   protected override async Task OnInitializedAsync()
   {
-    if(authenticationState is null)
+    if (authenticationState is null)
     {
       Console.WriteLine("WOPWO");
     }
     _subscription = ApplicationState.RegisterOnPersisting(Persist);
     var foundInState = ApplicationState
     .TryTakeFromJson<PlayerDto>("player", out var player);
+    
     if (foundInState)
     {
-      Console.WriteLine("FOUND PLAYERT");
       _player = player;
       return;
     }
-      Console.WriteLine("Player not found");
-
-    if (authenticationState is not null)
+    else if (authenticationState != null)
     {
       var state = await authenticationState;
+      Console.WriteLine("HEEI");
+      Console.WriteLine(state.User.GetUserId());
+      @* PlayerAppService.GetPlayerById(state.User.GetUserId()); *@
+      var id = state.User.GetUserId();
 
-      Console.WriteLine(state.User.Identity.Name);
-      var id = state.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-      var test = state.User.FindFirst(x => x.Type == "db_id")?.Value;
-      Console.WriteLine(test);
-      Console.WriteLine(id);
-      if (id is not null)
-      {
-        _player = await PlayerService.GetPlayerById(id);
-      }
+      _player = await PlayerService.GetPlayerById(id);
     }
-    @* player = await httpClient.GetFromJsonAsync<PlayerDto>("https://localhost:7275/api/players/current"); *@
   }
   private Task Persist()
   {

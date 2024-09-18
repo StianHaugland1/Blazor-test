@@ -133,55 +133,11 @@ app.MapGet("/api/players", async (MongoDbContext mongoDbContext) =>
     return Results.Ok(players);
 });
 
-// current player
-app.MapGet("/api/players/current", async (HttpContext httpContext, MongoDbContext mongoDbContext) =>
-{
-    var user = httpContext.User;
-    var authId = httpContext.User.Claims.SingleOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
-    Console.WriteLine(authId);
-    Console.WriteLine("hello");
-    Console.WriteLine(httpContext.User.Identity?.Name);
-    var player = await mongoDbContext.Players.FirstOrDefaultAsync(x => x.AuthId == authId);
-    if (player == null)
-    {
-        // return Results.NotFound();
-        return Results.Ok();
-    }
-    var playerDto = new PlayerDto
-    {
-        Name = player.Name,
-        Nickname = player.Nickname,
-        Emoji = player.Emoji,
-        AuthId = player.AuthId,
-        Wins = player.Wins,
-        Losses = player.Losses,
-        TotalMatches = player.TotalMatches,
-        Rating = player.Rating
-    };
-    return Results.Ok(player);
-});
-
-app.MapGet("/api/players/{id}", async (MongoDbContext mongoDbContext, string id) =>
+app.MapGet("/api/players/{id}", async (IPlayerAppService playerService, string id) =>
 {
-    var player = await mongoDbContext.Players.FirstOrDefaultAsync(x => x.AuthId == id);
-    if (player == null)
-    {
-        // return Results.NotFound();
-        return Results.Ok();
-    }
-    var playerDto = new PlayerDto
-    {
-        Name = player.Name,
-        Nickname = player.Nickname,
-        Emoji = player.Emoji,
-        AuthId = player.AuthId,
-        Wins = player.Wins,
-        Losses = player.Losses,
-        TotalMatches = player.TotalMatches,
-        Rating = player.Rating
-    };
-    return Results.Ok(player);
+        var player = await playerService.GetPlayerById(id);
+        return Results.Ok(player);
 });
 
 

@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using BlazorIntAuto.Common.Interfaces;
 
-public class PlayerAppService(HttpClient httpClient) : IPlayerAppService
+public class PlayerClientService(HttpClient httpClient) : IPlayerAppService
 {
     public async Task<PlayerDto> GetPlayerById(string id)
     {
