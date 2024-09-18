@@ -10,9 +10,17 @@
 @if (_player != null)
 {
   <div class="flex flex-col items-center justify-center gap-4">
-    <EditForm class="flex flex-col items-center justify-center gap-4" Model=@Person OnSubmit=@FormSubmitted>
-      <InputText class="bg-green-500 w-[200px]" @bind-Value="Person.Name" />
-      <InputNumber class="bg-green-500 w-[200px]" @bind-Value="Person.Age" />
+    <EditForm class="flex flex-col items-center justify-center gap-4" Model=@_player OnValidSubmit=@FormSubmitted>
+      <label>Name</label>
+      <InputText class="bg-slate-400 w-[200px]" @bind-Value="_player.Name" />
+      <label>Nickname</label>
+      <InputText class="bg-slate-400 w-[200px]" @bind-Value="_player.Nickname" />
+      <label>Emoji</label>
+      <div class="flex flex-col items-center gap-1">
+        <DataAnnotationsValidator/>  <!-- Enables validation based on the data annotations -->
+        <ValidationSummary class="text-red-600 bg-blue-400 mb-0"/>
+        <InputText class="bg-slate-400 w-[200px]" @bind-Value="_player.Emoji" />
+      </div>
       <input type="submit" value="Submit" class="btn btn-primary" />
     </EditForm>
 
@@ -78,9 +86,13 @@
     _subscription.Dispose();
   }
 
-  void FormSubmitted()
+  async Task FormSubmitted()
   {
     Status = "Form submitted";
+    if(_player is not null)
+    {
+      await PlayerService.UpdatePlayer(_player);
+    }
     // Post data to the server, etc
   }
 }

@@ -1,4 +1,5 @@
 using BlazorIntAuto.Common.Interfaces;
+using MongoDB.Bson;
 
 public class PlayerAppService(IPlayerService playerService) : IPlayerAppService
 {
@@ -17,5 +18,23 @@ public class PlayerAppService(IPlayerService playerService) : IPlayerAppService
             Rating = player.Rating
         };
         return playerDto;
+    }
+
+    public Task<PlayerDto[]> GetPlayers()
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task UpdatePlayer(PlayerDto player)
+    {
+        var playerToUpdate = await playerService.GetPlayerById(player.Id);
+        playerToUpdate.Name = player.Name;
+        playerToUpdate.Nickname = player.Nickname;
+        playerToUpdate.Emoji = player.Emoji;
+        playerToUpdate.Wins = player.Wins;
+        playerToUpdate.Losses = player.Losses;
+        playerToUpdate.TotalMatches = player.TotalMatches;
+        playerToUpdate.Rating = player.Rating;
+        await playerService.UpdatePlayer(playerToUpdate);
     }
 }

@@ -11,18 +11,15 @@ public class PersistentAuthenticationStateProvider : AuthenticationStateProvider
 
     public PersistentAuthenticationStateProvider(PersistentComponentState state)
     {
-        if (!state.TryTakeFromJson<UserInfo>(nameof(UserInfo), out var userInfo) || userInfo is null)
+        if (!state.TryTakeFromJson<User>(nameof(User), out var user) || user is null)
         {
             return;
         }
-        Console.WriteLine("Hello world");
-        Console.WriteLine(userInfo.SomeThing);
 
         Claim[] claims = [
-            new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
-            new Claim(ClaimTypes.Name, userInfo.Name),
-            new Claim("SomeThing", userInfo.SomeThing),
-            new Claim("db_id", userInfo.DbId),
+            new Claim(ClaimTypes.NameIdentifier, user.AuthId),
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim("db_id", user.DbId),
             ];
 
         _authenticationStateTask = Task.FromResult(
@@ -31,12 +28,4 @@ public class PersistentAuthenticationStateProvider : AuthenticationStateProvider
     }
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync() => _authenticationStateTask;
-}
-
-public class UserInfo
-{
-    public required string UserId { get; set; }
-    public required string Name { get; set; }
-    public required string SomeThing { get; set; }
-    public required string DbId { get; set; }
 }

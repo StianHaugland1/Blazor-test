@@ -28,6 +28,11 @@ if (connectionString == null)
 builder.Services.AddDbContext<MongoDbContext>(options =>
     options.UseMongoDB(connectionString, "Gamify"));
 
+builder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IPlayerAppService, PlayerAppService>();
+builder.Services.AddScoped<ITokenValidatedService, TokenValidatedService>();
+
 builder.Services
     .AddAuth0WebAppAuthentication(options =>
     {
@@ -38,45 +43,11 @@ builder.Services
         {
             OnTokenValidated = async (context) =>
             {
-                var authId = context.SecurityToken.Claims.SingleOrDefault(claim => claim.Type == "sub")?.Value;
-                var nickname = context.SecurityToken.Claims.SingleOrDefault(claim => claim.Type == "nickname")?.Value;
-                var name = context.SecurityToken.Claims.SingleOrDefault(claim => claim.Type == "name")?.Value;
-
-                if (string.IsNullOrWhiteSpace(authId))
-                {
-                    context.Fail("Invalid token");
-                }
-                var dbContext = context.HttpContext.RequestServices.GetRequiredService<MongoDbContext>();
-
-                var player = dbContext.Players.FirstOrDefault(x => x.AuthId == authId);
-                if (player == null)
-                {
-                    player = new Player
-                    {
-                        Id = ObjectId.GenerateNewId(),
-                        AuthId = authId!,
-                        Nickname = nickname ?? "Player",
-                        Name = name ?? "Name not found",
-                        Wins = 0,
-                        Losses = 0,
-                        TotalMatches = 0,
-                        Rating = 1500
-                    };
-                    dbContext.Players.Add(player);
-                    await dbContext.SaveChangesAsync();
-                }
-                if(context?.Principal?.Identity is not null)
-                {
-                    var claimsIdentity = (ClaimsIdentity)context.Principal.Identity;
-                    claimsIdentity.AddClaim(new Claim("db_id", player.Id.ToString()));
-                    context.Principal = new ClaimsPrincipal(claimsIdentity);
-                }
+                var tokenValidatedService = context.HttpContext.RequestServices.GetRequiredService<ITokenValidatedService>();
+                await tokenValidatedService.HandleValidatedToken(context);
             }
         };
     });
-builder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
-builder.Services.AddScoped<IPlayerService, PlayerService>();
-builder.Services.AddScoped<IPlayerAppService, PlayerAppService>();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
@@ -118,19 +89,19 @@ else
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapGet("/test", async (MongoDbContext mongoDbContext) =>
-{
-    // mongoDbContext.Users.Add(new User { Name = "Stian", Order = "2" });
-    // await mongoDbContext.SaveChangesAsync();
-    // var user = await mongoDbContext.Users.FirstOrDefaultAsync();
-    // return Results.Ok(user);
-    return Results.Ok();
-});
 
 app.MapGet("/api/players", async (MongoDbContext mongoDbContext) =>
 {
     var players = await mongoDbContext.Players.ToListAsync();
     return Results.Ok(players);
+});
+
+app.MapPut("/api/players/{id}", async (IPlayerAppService playerService, PlayerDto player) =>
+{
+    // var players = await mongoDbContext.Players.ToListAsync();
+    // return Results.Ok(players);
+    await playerService.UpdatePlayer(player);
+    return Results.Ok();
 });
 
 

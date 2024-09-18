@@ -1,5 +1,3 @@
-// using System.Diagnostics;
-// using Auth0BlazorDemo.Client.Services;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -48,12 +46,11 @@ public class PersistingAuthenticationStateProvider : ServerAuthenticationStatePr
             var name = principal.FindFirst("name")?.Value;
             if (userId != null && name != null && dbId != null)
             {
-                _state.PersistAsJson(nameof(UserInfo), new UserInfo
+                _state.PersistAsJson(nameof(User), new User
                 {
-                    UserId = userId,
+                    DbId = dbId,
+                    AuthId = userId,
                     Name = name,
-                    SomeThing = "WHAAATEVER",
-                    DbId = dbId
                 });
             }
         }
@@ -72,12 +69,4 @@ public class PersistingAuthenticationStateProvider : ServerAuthenticationStatePr
         AuthenticationStateChanged -= OnAuthenticationStateChanged;
         _subscription.Dispose();
     }
-}
-
-public class UserInfo
-{
-    public required string UserId { get; set; }
-    public required string Name { get; set; }
-    public required string SomeThing { get; set; }
-    public required string DbId { get; set; }
 }

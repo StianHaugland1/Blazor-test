@@ -1,10 +1,14 @@
-public class PlayerDto
+using System.ComponentModel.DataAnnotations;
+
+public record PlayerDto
 {
     public required string Id { get; set; }
     public string Name { get; set; } = "Name not found";
 
     public string Nickname { get; set; } = "Player";
     
+    [Required(ErrorMessage = "Nickname is required.")]
+    [StringLength(10, ErrorMessage = "Nickname length can't be more than 10 characters.")]
     public string Emoji { get; set; } = "🤓";
 
     public  int Wins { get; set; }
