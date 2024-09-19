@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using Auth0.AspNetCore.Authentication;
+using BlazorIntAuto.Common.Extentions;
 using BlazorIntAuto.Common.Interfaces;
 using BlazorIntAuto.Components;
 using Microsoft.AspNetCore.Authentication;
@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,8 +35,16 @@ builder.Services.AddScoped<ITokenValidatedService, TokenValidatedService>();
 builder.Services
     .AddAuth0WebAppAuthentication(options =>
     {
-        options.Domain = builder.Configuration["Auth0:Domain"];
-        options.ClientId = builder.Configuration["Auth0:ClientId"];
+        var domain = builder.Configuration["Auth0:Domain"];
+        var clientId = builder.Configuration["Auth0:ClientId"];
+        if (string.IsNullOrEmpty(domain) || string.IsNullOrEmpty(clientId))
+        {
+            Console.WriteLine("You must set your Auth0 domain and client ID. To learn how to set it, see https://auth0.com/docs/quickstart/webapp/aspnet-core");
+            Environment.Exit(0);
+        }
+        
+        options.Domain = domain;
+        options.ClientId = clientId;
 
         options.OpenIdConnectEvents = new OpenIdConnectEvents
         {
@@ -52,8 +59,6 @@ builder.Services
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
-
-
 
 var app = builder.Build();
 
@@ -98,17 +103,27 @@ app.MapGet("/api/players", async (MongoDbContext mongoDbContext) =>
 
 app.MapPut("/api/players/{id}", async (IPlayerAppService playerService, PlayerDto player) =>
 {
-    // var players = await mongoDbContext.Players.ToListAsync();
-    // return Results.Ok(players);
-    await playerService.UpdatePlayer(player);
+    await playerService.Update(player);
     return Results.Ok();
 });
 
 
 app.MapGet("/api/players/{id}", async (IPlayerAppService playerService, string id) =>
 {
-        var player = await playerService.GetPlayerById(id);
+        var player = await playerService.GetById(id);
         return Results.Ok(player);
+});
+
+app.MapGet("/api/players/me", async (HttpContext httpContext, IPlayerAppService playerService) =>
+{
+    if(!httpContext.User.Identity.IsAuthenticated)
+    {
+        return Results.Unauthorized();
+    }
+    var user = httpContext.User;
+    string id = httpContext.User.GetUserId();
+    var player = await playerService.GetById(id);
+    return Results.Ok(player);
 });
 
 

@@ -9,25 +9,29 @@
 
 @if (_player != null)
 {
-  <div class="flex flex-col items-center justify-center gap-4">
-    <EditForm class="flex flex-col items-center justify-center gap-4" Model=@_player OnValidSubmit=@FormSubmitted>
-      <label>Name</label>
-      <InputText class="bg-slate-400 w-[200px]" @bind-Value="_player.Name" />
-      <label>Nickname</label>
-      <InputText class="bg-slate-400 w-[200px]" @bind-Value="_player.Nickname" />
-      <label>Emoji</label>
-      <div class="flex flex-col items-center gap-1">
-        <DataAnnotationsValidator/>  <!-- Enables validation based on the data annotations -->
-        <ValidationSummary class="text-red-600 bg-blue-400 mb-0"/>
-        <InputText class="bg-slate-400 w-[200px]" @bind-Value="_player.Emoji" />
-      </div>
-      <input type="submit" value="Submit" class="btn btn-primary" />
-    </EditForm>
-
-    <a class="bg-red-500 px-8 py-4 text-white" href="Account/Logout">Log out</a>
+  <div class="flex pt-8 flex-col items-center justify-center gap-16">
+    <div class="flex flex-col items-center gap-5">
+    <h1 class="text-lg font-bold">Update Profile</h1>
+      <EditForm class="flex flex-col items-center justify-center gap-6" Model=@_player OnValidSubmit=@FormSubmitted>
+        <div class="flex flex-col items-center gap-1">
+          <label class="font-bold">Name</label>
+          <InputText class="w-[200px] text-center px-4 py-2 rounded-lg" @bind-Value="_player.Name" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <label class="font-bold">Nickname</label>
+          <InputText class="w-[200px] text-center px-4 py-2 rounded-lg" @bind-Value="_player.Nickname" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <label class="font-bold">Emoji</label>
+          <DataAnnotationsValidator /> <!-- Enables validation based on the data annotations -->
+          <ValidationSummary class="text-red-400 py-2" />
+          <InputText class="w-[200px] text-center px-4 py-2 rounded-lg" @bind-Value="_player.Emoji" />
+        </div>
+        <input type="submit" value="Submit" class="px-8 py-4 bg-primary-200 rounded-lg text-white mt-4" />
+      </EditForm>
+    </div>
+    <a class="bg-red-400 px-8 py-4 rounded-lg text-white" href="Account/Logout">Log out</a>
   </div>
-  <div>@_player.Emoji</div>
-  <button @onclick="onclick">click me</button>
 }
 
 @code
@@ -35,19 +39,9 @@
   [CascadingParameter]
   private Task<AuthenticationState>? authenticationState { get; set; }
 
-  public void onclick()
-  {
-    Console.WriteLine("clicked");
-
-  }
-
-  string Status = "Not submitted";
-  Person Person = new Person();
-
   private PlayerDto? _player;
 
   private PersistingComponentStateSubscription _subscription;
-
 
   protected override async Task OnInitializedAsync()
   {
@@ -58,7 +52,7 @@
     _subscription = ApplicationState.RegisterOnPersisting(Persist);
     var foundInState = ApplicationState
     .TryTakeFromJson<PlayerDto>("player", out var player);
-    
+
     if (foundInState)
     {
       _player = player;
@@ -69,10 +63,11 @@
       var state = await authenticationState;
       Console.WriteLine("HEEI");
       Console.WriteLine(state.User.GetUserId());
-      @* PlayerAppService.GetPlayerById(state.User.GetUserId()); *@
+      var user = state.User;
+      @* PlayerAppService.GetById(state.User.GetUserId()); *@
       var id = state.User.GetUserId();
 
-      _player = await PlayerService.GetPlayerById(id);
+      _player = await PlayerService.GetById(id);
     }
   }
   private Task Persist()
@@ -88,10 +83,9 @@
 
   async Task FormSubmitted()
   {
-    Status = "Form submitted";
-    if(_player is not null)
+    if (_player is not null)
     {
-      await PlayerService.UpdatePlayer(_player);
+      await PlayerService.Update(_player);
     }
     // Post data to the server, etc
   }

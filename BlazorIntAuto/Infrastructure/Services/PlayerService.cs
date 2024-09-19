@@ -4,12 +4,12 @@ using MongoDB.Bson;
 
 public interface IPlayerService
 {
-    Task<Player> GetPlayerById(string id);
+    Task<Player> GetById(string id);
     Task<Player?> GetPlayerByAuthId(string authId);
 
-    Task<Player> UpdatePlayer(Player player);
+    Task<Player> Update(Player player);
 
-    Task<Player[]> GetPlayers();
+    Task<Player[]> Get();
     Task<Player> AddPlayer(Player player);
 
 }
@@ -28,7 +28,7 @@ public class PlayerService(MongoDbContext dbContext) : IPlayerService
         return await dbContext.Players.FirstOrDefaultAsync(x => x.AuthId == authId);
     }
 
-    public async Task<Player> GetPlayerById(string id)
+    public async Task<Player> GetById(string id)
     {
         ObjectId.TryParse(id, out var objectId);
         var player = await dbContext.Players.FirstOrDefaultAsync(x => x.Id == objectId);
@@ -39,12 +39,12 @@ public class PlayerService(MongoDbContext dbContext) : IPlayerService
         return player;
     }
 
-    public Task<Player[]> GetPlayers()
+    public Task<Player[]> Get()
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Player> UpdatePlayer(Player player)
+    public async Task<Player> Update(Player player)
     {
         var playerToUpdate = await dbContext.Players.FirstOrDefaultAsync(x => x.Id == player.Id);
         if (playerToUpdate == null)

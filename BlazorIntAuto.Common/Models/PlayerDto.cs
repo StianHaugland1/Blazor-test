@@ -7,10 +7,10 @@ public record PlayerDto
 
     public string Nickname { get; set; } = "Player";
     
-    [Required(ErrorMessage = "Nickname is required.")]
-    [StringLength(10, ErrorMessage = "Nickname length can't be more than 10 characters.")]
+    [Required(ErrorMessage = "Emoji is required.")]
+    [EmojiValidation(ErrorMessage = "Invalid emoji.")]
     public string Emoji { get; set; } = "🤓";
-
+    
     public  int Wins { get; set; }
 
     public  int Losses { get; set; }
