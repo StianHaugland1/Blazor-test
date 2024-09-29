@@ -1,5 +1,5 @@
 ﻿@page "/qr-scanner"
-@rendermode InteractiveAuto
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 @layout MainFullLayout
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
@@ -9,8 +9,7 @@
     <div>Loading...</div>
 }
 
-
-<div id="reader" />
+<div  id="reader" />
 
 @code {
     private int _currentCount = 0;

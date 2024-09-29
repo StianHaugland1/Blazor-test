@@ -1,9 +1,11 @@
 ﻿@page "/leaderboard"
-@using System.Security.Claims
+@* @using System.Security.Claims *@
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
-@inject PersistentComponentState ApplicationState
+@* @inject PersistentComponentState ApplicationState *@
 @inject IPlayerAppService PlayerService
+@inject ICurrentPlayerService CurrentPlayer
 @attribute [Authorize]
+
 
 <h3>Leaderboard</h3>
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <!-- Weather goes here -->
@@ -19,8 +21,8 @@
 <div>hei</div>
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
+    @* [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; } *@
 
     private int _currentCount = 0;
     private QrCodeDto _qrcode;
@@ -33,14 +35,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (authenticationState is not null)
+        var id = await CurrentPlayer.GetCurrentPlayerId();
+        var qrcode = await PlayerService.GetQrCode(id);
+
+        _qrcode = qrcode;
+        
+        @* if (authenticationState is not null)
         {
             var state = await authenticationState;
             var id = state.User.GetUserId();
             var qrcode = await PlayerService.GetQrCode(id);
 
             _qrcode = qrcode;
-        }
+        } *@
     }
-
 }

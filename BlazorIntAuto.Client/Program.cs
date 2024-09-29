@@ -8,6 +8,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 builder.Services.AddScoped<IPlayerAppService, PlayerClientService>();
+builder.Services.AddScoped<ICurrentPlayerService, CurrentPlayerService>();
 builder.Services.AddScoped(sp => new HttpClient()
 {
     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
