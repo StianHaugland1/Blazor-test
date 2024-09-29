@@ -1,6 +1,7 @@
 using BlazorIntAuto.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using QRCoder;
 
 public interface IPlayerService
 {
@@ -11,6 +12,8 @@ public interface IPlayerService
 
     Task<Player[]> Get();
     Task<Player> AddPlayer(Player player);
+
+    Task<QrCodeDto> GetQrCode(string id);
 
 }
 
@@ -54,5 +57,20 @@ public class PlayerService(MongoDbContext dbContext) : IPlayerService
         playerToUpdate = player;
         await dbContext.SaveChangesAsync();
         return playerToUpdate;
+    }
+
+    public Task<QrCodeDto> GetQrCode(string id)
+    {
+        using (QRCodeGenerator qrGenerator = new QRCodeGenerator())
+        using (QRCodeData qrCodeData = qrGenerator.CreateQrCode(id, QRCodeGenerator.ECCLevel.Q))
+        using (PngByteQRCode qrCode = new PngByteQRCode(qrCodeData))
+        {
+            byte[] qrCodeImage = qrCode.GetGraphic(20);
+
+            return Task.FromResult(new QrCodeDto
+            {
+                QrCode = Convert.ToBase64String(qrCodeImage)
+            });
+        }
     }
 }

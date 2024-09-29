@@ -32,4 +32,14 @@ public class PlayerClientService(HttpClient httpClient) : IPlayerAppService
             throw new Exception("Failed to update player");
         }
     }
+
+    public async Task<QrCodeDto> GetQrCode(string id)
+    {
+        var qrCodeDto = await httpClient.GetFromJsonAsync<QrCodeDto>($"/api/players/qrcode/{id}");
+        if (qrCodeDto == null)
+        {
+            throw new Exception("Qrcode generation failed");
+        }
+        return qrCodeDto;
+    }
 }

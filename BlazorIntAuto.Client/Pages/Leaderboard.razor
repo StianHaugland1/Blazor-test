@@ -1,46 +1,46 @@
 ﻿@page "/leaderboard"
 @using System.Security.Claims
-@rendermode InteractiveWebAssembly
-@* @attribute [Authorize] *@
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+@inject PersistentComponentState ApplicationState
+@inject IPlayerAppService PlayerService
+@attribute [Authorize]
 
-
-
-<AuthorizeView>
-    <Authorized>
-        <h3>Leaderboard</h3>
-        <button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <!-- Weather goes here -->
-    </Authorized>
-    <NotAuthorized>
-        <button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <!-- Weather goes here -->
-        You are not authorised!
-    </NotAuthorized>
-</AuthorizeView>
+<h3>Leaderboard</h3>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <!-- Weather goes here -->
+@if(_qrcode is not null)
+{
+    <div class="flex items-center justify-center">
+        <div class="max-w-36">
+            <img class="" src="data:image/jpeg;base64,@_qrcode.QrCode"/>
+        </div>
+    </div>
+    
+}
+<div>hei</div>
 
 @code {
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
 
     private int _currentCount = 0;
+    private QrCodeDto _qrcode;
+
     private async void IncrementCount()
     {
         _currentCount++;
-        Console.WriteLine("Incremented count");
-        if(authenticationState is not null){
+        Console.WriteLine(_qrcode.QrCode);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is not null)
+        {
             var state = await authenticationState;
-            var l = state.User.Claims.ToList();
+            var id = state.User.GetUserId();
+            var qrcode = await PlayerService.GetQrCode(id);
 
-            @* Console.WriteLine(l[1]);
-            Console.WriteLine(l[0]);
-            Console.WriteLine(l[3]); *@
-            Console.WriteLine(l[2]);
-            Console.WriteLine("hi");
-            var k = state.User.FindFirst("SomeThing");
-            Console.WriteLine(k?.Value);
+            _qrcode = qrcode;
         }
-
-        
-        
     }
 
 }
-    @* using System.Security.Claims; *@

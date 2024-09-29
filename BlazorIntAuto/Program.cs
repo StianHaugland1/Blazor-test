@@ -126,6 +126,12 @@ app.MapGet("/api/players/me", async (HttpContext httpContext, IPlayerAppService 
     return Results.Ok(player);
 });
 
+app.MapGet("/api/players/qrcode/{id}", async (IPlayerAppService playerService, string id) =>
+{
+    var qrcode = await playerService.GetQrCode(id);
+    return Results.Ok(qrcode);
+});
+
 
 app.MapGet("/Account/Login", async (HttpContext httpContext, string returnUrl = "/") =>
 {

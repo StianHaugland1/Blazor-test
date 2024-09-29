@@ -23,7 +23,7 @@
         "commandName": "Project",
         "dotnetRunMessages": true,
         "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-        "applicationUrl": "https://localhost:7275;http://localhost:5254",
+        "applicationUrl": "https://0.0.0.0:7275;http://localhost:5254",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development",
           "MONGODB_URI": "mongodb://root:example@127.0.0.1:27017/"

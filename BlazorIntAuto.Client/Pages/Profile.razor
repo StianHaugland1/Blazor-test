@@ -61,10 +61,7 @@
     else if (authenticationState != null)
     {
       var state = await authenticationState;
-      Console.WriteLine("HEEI");
-      Console.WriteLine(state.User.GetUserId());
       var user = state.User;
-      @* PlayerAppService.GetById(state.User.GetUserId()); *@
       var id = state.User.GetUserId();
 
       _player = await PlayerService.GetById(id);

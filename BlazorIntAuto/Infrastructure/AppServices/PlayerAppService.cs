@@ -36,4 +36,9 @@ public class PlayerAppService(IPlayerService playerService) : IPlayerAppService
         playerToUpdate.Rating = player.Rating;
         await playerService.Update(playerToUpdate);
     }
+
+    public Task<QrCodeDto> GetQrCode(string id)
+    {
+        return playerService.GetQrCode(id);
+    }
 }
